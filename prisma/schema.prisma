@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String      @id @default(cuid())
+  email       String      @unique
+  password    String
+  name        String
+  role        Role
+  department  String      @default("Product")
+  entraObjectId String?   @unique
+  entraGroups Json?
+  managerId   String?
+  manager     User?       @relation("ManagerTeam", fields: [managerId], references: [id])
+  teamMembers User[]      @relation("ManagerTeam")
+  goalSheets  GoalSheet[]
+  notifications Notification[]
+  escalationLogs EscalationLog[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model GoalSheet {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year        Int
+  status      SheetStatus @default(DRAFT)
+  managerNote String?
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  goals       Goal[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([userId, year])
+}
+
+model Goal {
+  id          String     @id @default(cuid())
+  sheetId     String
+  sheet       GoalSheet  @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  thrustArea  String
+  uom         UoMType
+  target      Float
+  weightage   Int
+  isShared    Boolean    @default(false)
+  checkIns    CheckIn[]
+  auditLogs   AuditLog[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model CheckIn {
+  id             String         @id @default(cuid())
+  goalId         String
+  goal           Goal           @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  quarter        Quarter
+  status         ProgressStatus
+  actualValue    Float
+  managerComment String?
+  submittedAt    DateTime       @default(now())
+
+  @@unique([goalId, quarter])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  goalId       String
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  changedBy    String
+  changeDetail Json
+  timestamp    DateTime @default(now())
+}
+
+model Notification {
+  id          String              @id @default(cuid())
+  recipientId String
+  recipient   User                @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  channel     NotificationChannel
+  eventType   String
+  title       String
+  message     String
+  deepLink    String?
+  adaptiveCard Json?
+  status      NotificationStatus  @default(SENT)
+  createdAt   DateTime            @default(now())
+}
+
+model EscalationRule {
+  id            String              @id @default(cuid())
+  name          String
+  condition     EscalationCondition
+  thresholdDays Int                 @default(3)
+  level1        String              @default("Employee")
+  level2        String              @default("Manager")
+  level3        String              @default("HR")
+  active        Boolean             @default(true)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model EscalationLog {
+  id          String              @id @default(cuid())
+  ruleId      String?
+  ruleName    String
+  userId      String?
+  user        User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  targetRole  String
+  message     String
+  level       EscalationLevel
+  status      EscalationStatus    @default(OPEN)
+  createdAt   DateTime            @default(now())
+  resolvedAt  DateTime?
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum SheetStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum UoMType {
+  NUMERIC_MIN
+  NUMERIC_MAX
+  TIMELINE
+  ZERO
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  ON_TRACK
+  AT_RISK
+  COMPLETED
+}
+
+enum NotificationChannel {
+  EMAIL
+  TEAMS
+}
+
+enum NotificationStatus {
+  SENT
+  READ
+}
+
+enum EscalationCondition {
+  GOALS_NOT_SUBMITTED
+  MANAGER_APPROVAL_PENDING
+  CHECKIN_NOT_COMPLETED
+}
+
+enum EscalationLevel {
+  EMPLOYEE
+  MANAGER
+  HR
+}
+
+enum EscalationStatus {
+  OPEN
+  RESOLVED
+}

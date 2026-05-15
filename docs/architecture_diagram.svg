@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <rect width="1200" height="760" fill="#f5f7fb"/>
+  <style>
+    .box { fill: #ffffff; stroke: #d7dee9; stroke-width: 2; rx: 8; }
+    .core { fill: #edf9f5; stroke: #0f766e; }
+    .title { font: 700 20px Arial, sans-serif; fill: #111827; }
+    .text { font: 500 14px Arial, sans-serif; fill: #344054; }
+    .small { font: 500 12px Arial, sans-serif; fill: #667085; }
+    .line { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <text x="60" y="54" class="title">AtomQuest Goal Setting and Tracking Portal</text>
+  <text x="60" y="78" class="small">React + Express + Prisma + Local PostgreSQL, exposed through a public demo tunnel</text>
+
+  <rect x="60" y="130" width="210" height="90" class="box"/>
+  <text x="85" y="164" class="title">Web Browser</text>
+  <text x="85" y="190" class="text">Public demo URL</text>
+
+  <rect x="330" y="130" width="220" height="90" class="box"/>
+  <text x="360" y="164" class="title">Cloudflare Tunnel</text>
+  <text x="360" y="190" class="text">HTTPS access</text>
+
+  <rect x="620" y="110" width="250" height="130" class="box core"/>
+  <text x="650" y="150" class="title">Node + Express</text>
+  <text x="650" y="178" class="text">API, auth, workflows</text>
+  <text x="650" y="204" class="text">Serves built React UI</text>
+
+  <rect x="940" y="130" width="200" height="90" class="box"/>
+  <text x="970" y="164" class="title">PostgreSQL</text>
+  <text x="970" y="190" class="text">Local database</text>
+
+  <path d="M270 175 H330" class="line"/>
+  <path d="M550 175 H620" class="line"/>
+  <path d="M870 175 H940" class="line"/>
+
+  <rect x="60" y="310" width="220" height="110" class="box"/>
+  <text x="90" y="348" class="title">Employee</text>
+  <text x="90" y="376" class="text">Draft goals</text>
+  <text x="90" y="400" class="text">Submit and check in</text>
+
+  <rect x="330" y="310" width="220" height="110" class="box"/>
+  <text x="360" y="348" class="title">Manager L1</text>
+  <text x="360" y="376" class="text">Review and approve</text>
+  <text x="360" y="400" class="text">Comments and feedback</text>
+
+  <rect x="600" y="310" width="220" height="110" class="box"/>
+  <text x="630" y="348" class="title">Admin / HR</text>
+  <text x="630" y="376" class="text">Cycles, unlock, audit</text>
+  <text x="630" y="400" class="text">Exports and governance</text>
+
+  <path d="M710 240 V310" class="line"/>
+  <path d="M710 270 H170 V310" class="line"/>
+  <path d="M710 270 H440 V310" class="line"/>
+
+  <rect x="60" y="500" width="250" height="120" class="box"/>
+  <text x="90" y="536" class="title">Microsoft Entra ID</text>
+  <text x="90" y="564" class="text">SSO simulation</text>
+  <text x="90" y="588" class="text">Group to role mapping</text>
+
+  <rect x="350" y="500" width="250" height="120" class="box"/>
+  <text x="380" y="536" class="title">Email + Teams</text>
+  <text x="380" y="564" class="text">Notifications</text>
+  <text x="380" y="588" class="text">Adaptive cards + links</text>
+
+  <rect x="640" y="500" width="250" height="120" class="box"/>
+  <text x="670" y="536" class="title">Escalations</text>
+  <text x="670" y="564" class="text">Configurable rules</text>
+  <text x="670" y="588" class="text">Chain and logs</text>
+
+  <rect x="930" y="500" width="210" height="120" class="box"/>
+  <text x="960" y="536" class="title">Analytics</text>
+  <text x="960" y="564" class="text">QoQ and heatmaps</text>
+  <text x="960" y="588" class="text">Manager effectiveness</text>
+
+  <path d="M745 240 V465 H185 V500" class="line"/>
+  <path d="M745 240 V465 H475 V500" class="line"/>
+  <path d="M745 240 V465 H765 V500" class="line"/>
+  <path d="M745 240 V465 H1035 V500" class="line"/>
+</svg>
