@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AtomQuest Goal Portal - Submission</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1,
+        h2 {
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 0.3em;
+        }
+
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .diagram-container {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f6f8fa;
+            border-radius: 6px;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .diagram-container {
+                background: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>AtomQuest Goal Portal - Submission</h1>
+
+    <h2>Working Link</h2>
+    <p><a href="https://630e07c98e91bd.lhr.life" target="_blank">https://630e07c98e91bd.lhr.life</a></p>
+
+    <h2>Source Code Repository</h2>
+    <p><a href="https://github.com/coder200412/Atomquet" target="_blank">https://github.com/coder200412/Atomquet</a></p>
+
+    <h2>Architecture Diagram</h2>
+    <div class="diagram-container">
+        <div class="mermaid">
+            flowchart LR
+            Browser["Web Browser / Public Demo URL"] --> Tunnel["Cloudflare Quick Tunnel"]
+            Tunnel --> Express["Node.js + Express API"]
+            Express --> React["Built React UI served from /dist"]
+            Express --> Prisma["Prisma ORM"]
+            Prisma --> Postgres["Local PostgreSQL database"]
+
+            Express --> Auth["JWT Auth + Demo Microsoft Entra SSO"]
+            Auth --> Directory["Entra-style directory sync: groups, roles, manager mapping"]
+
+            Express --> Workflow["Goal lifecycle APIs"]
+            Workflow --> Employee["Employee: draft, submit, check-ins"]
+            Workflow --> Manager["Manager: review, edit, approve, comments"]
+            Workflow --> Admin["Admin / HR: cycles, unlock, audit, exports"]
+
+            Express --> Notifications["Email and Teams notification log"]
+            Notifications --> Cards["Teams adaptive card payloads + deep links"]
+
+            Express --> Escalations["Rule-based escalation engine"]
+            Escalations --> Logs["Escalation rules and logs"]
+
+            Express --> Analytics["Analytics module"]
+            Analytics --> Charts["QoQ trends, heatmaps, goal mix, manager effectiveness"]
+        </div>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+
+</html>
