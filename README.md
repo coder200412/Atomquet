@@ -3,7 +3,7 @@
 AtomQuest Goal Portal is a robust, web-based goal setting and tracking application designed with role-specific journeys for Employees, L1 Managers, and Admin / HR. It provides a seamless experience for creating, approving, and tracking professional goals throughout their lifecycle.
 
 ## Links
-* **Live Demo:** [https://3b9b120e655398.lhr.life](https://3b9b120e655398.lhr.life)
+* **Live Demo:** [https://tail-omissions-pension-lot.trycloudflare.com](https://tail-omissions-pension-lot.trycloudflare.com)
 * **Source Code:** [https://github.com/coder200412/Atomquet](https://github.com/coder200412/Atomquet)
 
 ## Features
