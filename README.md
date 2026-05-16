@@ -6,6 +6,7 @@ AtomQuest Goal Portal is a robust, web-based goal setting and tracking applicati
 * **Live Demo:** [https://tail-omissions-pension-lot.trycloudflare.com](https://tail-omissions-pension-lot.trycloudflare.com)
 * **Source Code:** [https://github.com/coder200412/Atomquet](https://github.com/coder200412/Atomquet)
 * **BRD Alignment:** [docs/brd_alignment.md](docs/brd_alignment.md)
+* **Submission Packet:** [DOCX](docs/AtomQuest_Hackathon_Submission_Packet.docx) | [PDF](docs/AtomQuest_Hackathon_Submission_Packet.pdf)
 
 ## Features
 * **Role-based Workflows:** Distinct views and permissions for Employees, Managers, and Admins.
