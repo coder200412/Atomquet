@@ -1011,6 +1011,10 @@ app.patch(
       return res.status(400).json({ message: "Employees can only edit draft or rejected sheets." });
     }
 
+    if (req.user.role === "MANAGER" && goal.sheet.status !== "SUBMITTED") {
+      return res.status(400).json({ message: "Managers can edit goals only while the sheet is submitted for review." });
+    }
+
     const payload = validateGoalPayload(req.body, true);
     await maybeAudit(goal, req.user.id, goal, payload);
     if (goal.isShared && req.user.role === "EMPLOYEE") {
@@ -1052,6 +1056,10 @@ app.delete(
       return res.status(400).json({ message: "Employees can only delete goals from draft or rejected sheets." });
     }
 
+    if (req.user.role === "MANAGER" && goal.sheet.status !== "SUBMITTED") {
+      return res.status(400).json({ message: "Managers can delete goals only while the sheet is submitted for review." });
+    }
+
     await prisma.goal.delete({ where: { id: goal.id } });
     res.status(204).end();
   })
@@ -1065,6 +1073,10 @@ app.post(
     const sheet = await getSheetOrThrow(req.params.id);
     await assertSheetAccess(req.user, sheet, "write");
     const validation = validateSheetForSubmit(sheet);
+
+    if (req.user.role === "MANAGER" && sheet.status !== "SUBMITTED") {
+      return res.status(400).json({ message: "Managers can approve only submitted goal sheets." });
+    }
 
     if (validation) return res.status(400).json({ message: validation });
     if (req.user.role === "EMPLOYEE" && !["DRAFT", "REJECTED"].includes(sheet.status)) {
@@ -1124,6 +1136,10 @@ app.post(
     const sheet = await getSheetOrThrow(req.params.id);
     await assertSheetAccess(req.user, sheet, "write");
     const note = String(req.body.managerNote || "").trim();
+
+    if (req.user.role === "MANAGER" && sheet.status !== "SUBMITTED") {
+      return res.status(400).json({ message: "Managers can return only submitted goal sheets." });
+    }
 
     if (!note) return res.status(400).json({ message: "A rejection note is required." });
 

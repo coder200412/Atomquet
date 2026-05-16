@@ -471,6 +471,7 @@ function ManagerDashboard({ api, action, team, notifications, busy }) {
 
   const pending = team.filter((member) => member.sheet?.status === "SUBMITTED").length;
   const approved = team.filter((member) => member.sheet?.status === "APPROVED").length;
+  const canReview = sheet?.status === "SUBMITTED";
 
   return (
     <div className="manager-grid">
@@ -509,38 +510,44 @@ function ManagerDashboard({ api, action, team, notifications, busy }) {
         {sheet ? (
           <>
             <PanelHeader title={selected.name} meta={`${sheet.totalWeightage}% weightage`} />
-            <GoalTable goals={sheet.goals} canEdit onEdit={setEditing} />
-            <div className="approval-row">
-              <input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Manager note" />
-              <button
-                className="primary-action"
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  action(
-                    () => api(`/sheets/${sheet.id}/approve`, { method: "POST", body: JSON.stringify({ managerNote: note }) }),
-                    "Sheet approved."
-                  )
-                }
-              >
-                <CheckCircle2 size={17} />
-                Approve
-              </button>
-              <button
-                className="danger-action"
-                type="button"
-                disabled={busy || !note.trim()}
-                onClick={() =>
-                  action(
-                    () => api(`/sheets/${sheet.id}/reject`, { method: "POST", body: JSON.stringify({ managerNote: note }) }),
-                    "Sheet returned."
-                  )
-                }
-              >
-                <XCircle size={17} />
-                Reject
-              </button>
-            </div>
+            <GoalTable goals={sheet.goals} canEdit={canReview} onEdit={setEditing} />
+            {canReview ? (
+              <div className="approval-row">
+                <input value={note} onChange={(event) => setNote(event.target.value)} placeholder="Manager note" />
+                <button
+                  className="primary-action"
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    action(
+                      () => api(`/sheets/${sheet.id}/approve`, { method: "POST", body: JSON.stringify({ managerNote: note }) }),
+                      "Sheet approved."
+                    )
+                  }
+                >
+                  <CheckCircle2 size={17} />
+                  Approve
+                </button>
+                <button
+                  className="danger-action"
+                  type="button"
+                  disabled={busy || !note.trim()}
+                  onClick={() =>
+                    action(
+                      () => api(`/sheets/${sheet.id}/reject`, { method: "POST", body: JSON.stringify({ managerNote: note }) }),
+                      "Sheet returned."
+                    )
+                  }
+                >
+                  <XCircle size={17} />
+                  Reject
+                </button>
+              </div>
+            ) : (
+              <div className="notice-band">
+                {sheet.status === "APPROVED" ? "Approved sheets are locked. Admin / HR can unlock exceptions." : "Waiting for employee submission."}
+              </div>
+            )}
             <ManagerComments goals={sheet.goals} api={api} action={action} />
           </>
         ) : (
