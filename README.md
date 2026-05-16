@@ -12,6 +12,7 @@ AtomQuest Goal Portal is a robust, web-based goal setting and tracking applicati
 * **Simulated SSO:** Microsoft Entra-style SSO and directory sync simulation.
 * **Extensible Notification & Escalation:** Built-in module for email and Teams notifications along with a rule-based escalation engine.
 * **Analytics Dashboard:** Visualise data including QoQ trends, heatmaps, goal mix, and manager effectiveness.
+* **Public Signup:** Hackathon visitors can create an Employee or Manager account and sign back in with their email and password.
 
 ## Architecture
 
@@ -77,3 +78,17 @@ flowchart LR
    ```bash
    npm run start
    ```
+
+## Render Deployment
+
+Use a Render Web Service with Render Postgres.
+
+```bash
+# Build command
+npm install && npx prisma generate && npm run build
+
+# Start command
+npm run db:deploy && npm run start
+```
+
+`npm run db:deploy` applies the Prisma schema and seeds demo users only when the database is empty, so newly created hackathon accounts are preserved.

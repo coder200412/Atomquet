@@ -7,7 +7,8 @@
     "db:init": "node scripts/ensure-postgres.mjs",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
-    "db:reset": "npm run db:init && npm run db:push && npm run db:seed",
+    "db:reset": "npm run db:init && npm run db:push && node prisma/seed.mjs --force",
+    "db:deploy": "prisma db push && npm run db:seed",
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "start": "node server/index.js"

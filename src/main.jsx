@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Target,
   Trash2,
+  UserPlus,
   Users,
   XCircle
 } from "lucide-react";
@@ -131,6 +132,31 @@ function App() {
     }
   }
 
+  async function signup(account) {
+    setBusy(true);
+    setError("");
+    try {
+      const next = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(account)
+      }).then(async (response) => {
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.message || "Signup failed.");
+        }
+        return response.json();
+      });
+      setAuth(next);
+      localStorage.setItem("atomquest.auth", JSON.stringify(next));
+      setNotice(`Account created for ${next.user.name}.`);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function entraLogin(email) {
     setBusy(true);
     setError("");
@@ -178,7 +204,7 @@ function App() {
   }
 
   if (!auth) {
-    return <LoginScreen onLogin={login} onEntraLogin={entraLogin} busy={busy} error={error} />;
+    return <LoginScreen onLogin={login} onSignup={signup} onEntraLogin={entraLogin} busy={busy} error={error} />;
   }
 
   return (
@@ -241,9 +267,14 @@ function App() {
   );
 }
 
-function LoginScreen({ onLogin, onEntraLogin, busy, error }) {
+function LoginScreen({ onLogin, onSignup, onEntraLogin, busy, error }) {
+  const [mode, setMode] = React.useState("signin");
+  const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState(ACCOUNTS[0][1]);
   const [password, setPassword] = React.useState("password123");
+  const [role, setRole] = React.useState("EMPLOYEE");
+  const [department, setDepartment] = React.useState("Product");
+  const isSignup = mode === "signup";
 
   return (
     <main className="login-screen">
@@ -260,9 +291,19 @@ function LoginScreen({ onLogin, onEntraLogin, busy, error }) {
           className="login-form"
           onSubmit={(event) => {
             event.preventDefault();
-            onLogin(email, password);
+            if (isSignup) {
+              onSignup({ name, email, password, role, department });
+            } else {
+              onLogin(email, password);
+            }
           }}
         >
+          {isSignup && (
+            <label>
+              Name
+              <input value={name} onChange={(event) => setName(event.target.value)} />
+            </label>
+          )}
           <label>
             Email
             <input value={email} onChange={(event) => setEmail(event.target.value)} />
@@ -271,20 +312,63 @@ function LoginScreen({ onLogin, onEntraLogin, busy, error }) {
             Password
             <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
           </label>
+          {isSignup && (
+            <div className="form-row">
+              <label>
+                Role
+                <select value={role} onChange={(event) => setRole(event.target.value)}>
+                  <option value="EMPLOYEE">Employee</option>
+                  <option value="MANAGER">Manager</option>
+                </select>
+              </label>
+              <label>
+                Department
+                <select value={department} onChange={(event) => setDepartment(event.target.value)}>
+                  <option value="Product">Product</option>
+                  <option value="Platform">Platform</option>
+                  <option value="Operations">Operations</option>
+                  <option value="HR">HR</option>
+                </select>
+              </label>
+            </div>
+          )}
           <button className="primary-action" type="submit" disabled={busy}>
-            <Send size={18} />
-            Sign in
+            {isSignup ? <UserPlus size={18} /> : <Send size={18} />}
+            {isSignup ? "Create account" : "Sign in"}
+          </button>
+          <button
+            className="ghost-action"
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setMode(isSignup ? "signin" : "signup");
+              if (!isSignup) {
+                setEmail("");
+                setPassword("");
+              }
+            }}
+          >
+            {isSignup ? <Send size={18} /> : <UserPlus size={18} />}
+            {isSignup ? "Use existing account" : "Create account"}
           </button>
           <button className="ghost-action" type="button" disabled={busy} onClick={() => onEntraLogin(email)}>
             <ShieldCheck size={18} />
             Microsoft Entra SSO
           </button>
-          <p className="login-hint">Use a listed account or enter any new email. Emails containing admin or manager open those role views.</p>
+          <p className="login-hint">Hackathon visitors can create an account. Demo accounts use password123.</p>
         </form>
 
         <div className="account-grid">
           {ACCOUNTS.map(([role, account]) => (
-            <button key={account} type="button" onClick={() => setEmail(account)}>
+            <button
+              key={account}
+              type="button"
+              onClick={() => {
+                setMode("signin");
+                setEmail(account);
+                setPassword("password123");
+              }}
+            >
               <span>{role}</span>
               <strong>{account}</strong>
             </button>

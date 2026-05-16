@@ -4,6 +4,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const year = Number(process.env.APP_YEAR || 2026);
 const password = await bcrypt.hash("password123", 10);
+const force = process.argv.includes("--force");
+
+const existingUsers = await prisma.user.count();
+if (existingUsers > 0 && !force) {
+  console.log(`Database already has ${existingUsers} user(s); skipping demo seed.`);
+  await prisma.$disconnect();
+  process.exit(0);
+}
 
 async function createUser(data) {
   return prisma.user.create({

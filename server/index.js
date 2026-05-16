@@ -18,6 +18,7 @@ const jwtSecret = process.env.JWT_SECRET || "atomquest-demo";
 const port = Number(process.env.PORT || 8080);
 const host = process.env.HOST || "0.0.0.0";
 const quarters = ["Q1", "Q2", "Q3", "Q4"];
+const publicSignupRoles = new Set(["EMPLOYEE", "MANAGER"]);
 let cycleOverride = quarters.includes(process.env.ACTIVE_QUARTER) ? process.env.ACTIVE_QUARTER : null;
 
 app.use(cors());
@@ -104,9 +105,14 @@ function nameFromEmail(email) {
   return name || "Demo User";
 }
 
-async function createDemoUser(email, password) {
-  const role = inferRole(email);
-  const department = departmentFromEmail(email);
+function safeDepartment(value, email) {
+  const department = String(value || "").trim();
+  return department || departmentFromEmail(email);
+}
+
+async function createDemoUser(email, password, options = {}) {
+  const role = options.role || inferRole(email);
+  const department = safeDepartment(options.department, email);
   const manager =
     role === "EMPLOYEE"
       ? await prisma.user.findFirst({
@@ -123,7 +129,7 @@ async function createDemoUser(email, password) {
     data: {
       email,
       password: await bcrypt.hash(password, 10),
-      name: nameFromEmail(email),
+      name: String(options.name || "").trim() || nameFromEmail(email),
       role,
       department,
       entraObjectId: `demo-${email}`,
@@ -835,6 +841,41 @@ async function dashboardFor(user) {
 }
 
 app.post(
+  "/api/auth/signup",
+  asyncRoute(async (req, res) => {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+    const requestedRole = String(req.body.role || "EMPLOYEE").trim().toUpperCase();
+    const role = publicSignupRoles.has(requestedRole) ? requestedRole : "EMPLOYEE";
+    const department = safeDepartment(req.body.department, email);
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "Enter a valid email address." });
+    }
+
+    if (password.trim().length < 6) {
+      return res.status(400).json({ message: "Use a password with at least 6 characters." });
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return res.status(409).json({ message: "An account already exists for this email. Sign in instead." });
+    }
+
+    const user = await createDemoUser(email, password, {
+      name: req.body.name,
+      role,
+      department
+    });
+
+    res.status(201).json({
+      token: signUser(user),
+      user: publicUser(user)
+    });
+  })
+);
+
+app.post(
   "/api/auth/login",
   asyncRoute(async (req, res) => {
     const email = String(req.body.email || "").trim().toLowerCase();
@@ -850,8 +891,10 @@ app.post(
     }
 
     if (!user) {
-      user = await createDemoUser(email, password);
-    } else if (!(await bcrypt.compare(password, user.password))) {
+      return res.status(404).json({ message: "Account not found. Create an account first or use a demo account." });
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
